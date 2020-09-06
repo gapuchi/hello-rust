@@ -530,3 +530,160 @@ fn main() {
 1. You can either have one mutable or any number of immutable references.
 1. References must always be valid.
 
+### The Slice Type
+
+An example - Write a function that takes a string and returns the first word it finds in that string. If no word is found, then the whole string should be returned.
+
+The signature of the function:
+
+```rust
+fn first_word(s: &String) -> ?
+```
+
+We have one parameter that takes in a reference to a string. We do not want ownership, so that's fine. What do we return?
+
+One example is to return an index:
+
+```rust
+fn first_word(s: &String) -> usize {
+    let bytes = s.as_bytes(); //Convert a string into an array to check every element
+
+    for (i, &item) in bytes.iter().enumerate() { //Create an iterator
+        if item == b' ' { //Compare  to the byte literal space
+            return i;
+        }
+    }
+
+    s.len()
+}
+```
+
+The only problem here - the `usize` returned here only has meaning in the context of `&String`. We have no guarantee that it will be valid in the future. Something could modify the `&String`:
+
+```rust
+fn main() {
+    let mut s = String::from("hello world");
+
+    let word = first_word(&s); // word will get the value 5
+
+    s.clear(); // this empties the String, making it equal to ""
+
+    // word still has the value 5 here, but there's no more string that
+    // we could meaningfully use the value 5 with. word is now totally invalid!
+}
+```
+
+This compiles without any issues. We need to worry about keeping `word` in sync with `s`. Plus if we decided to get the second word from the string, it becomes more complicated, having to return the start and end indices.
+
+The solution? String slices
+
+#### String Slices
+
+**Slice** references a sequence of elements in a collection, instead of a whole collection. It **does not have ownership**.
+
+A *string slice* is a reference to part of a `String`
+
+```rust
+fn main() {
+    let s = String::from("hello world");
+
+    let hello = &s[0..5];
+    let world = &s[6..11];
+}
+```
+
+With Rust's range syntax `..`, you can drop the value before the dots if you want to start at the 0 index. If you want to include the last byte, you can drop the value after `..`. The type that signifies “string slice” is written as `&str`.
+
+A function to find the first word:
+
+```rust
+fn first_word(s: &String) -> &str {
+    let bytes = s.as_bytes();
+
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return &s[0..i];
+        }
+    }
+
+    &s[..]
+}
+```
+
+Rust compiler ensures that references to the string remain valid. So now this would error at compile time:
+
+```rust
+fn main() {
+    let mut s = String::from("hello world");
+
+    let word = first_word(&s);
+
+    s.clear(); // error!
+
+    println!("the first word is: {}", word);
+}
+```
+
+Rust doesn't let you have a mutable reference if you already have an immutable reference. `clear` needs a mutable reference (because it is modifying the string), but we passed an immutable reference to `first_word`.
+
+#### String Literals Are Slices
+
+```rust
+let s = "Hello, world!";
+```
+
+Recall string literals being stored inside the binary. The type of `s` here is `&str`: it’s a slice pointing to that specific point of the binary. This is also why string literals are immutable; `&str` is an immutable reference.
+
+#### String Slices as Parameters
+
+One improvement to the signature:
+
+```rust
+fn first_word(s: &String) -> &str {
+```
+
+can be written as:
+
+```rust
+fn first_word(s: &str) -> &str {
+```
+
+This allows us to use the same function for `&String` and `&str`.
+
+If we have a string slice, we can pass it directly. If we have a string, we can pass a slice of the whole string.
+
+```rust
+fn main() {
+    let my_string = String::from("hello world");
+
+    // first_word works on slices of `String`s
+    let word = first_word(&my_string[..]);
+
+    let my_string_literal = "hello world";
+
+    // first_word works on slices of string literals
+    let word = first_word(&my_string_literal[..]);
+
+    // Because string literals *are* string slices already,
+    // this works too, without the slice syntax!
+    let word = first_word(my_string_literal);
+}
+```
+
+#### Other Slices
+
+We can take a slice of arrays besides strings:
+
+```rust
+let a = [1, 2, 3, 4, 5];
+let slice = &a[1..3];
+```
+
+The slice has the type `&[i32]`.
+
+## Using Structs to Structure Related Data
+
+A *struct* is a custom data type. It is like an object's data attributes if you're thinking about object-oriented programming.
+
+### Defining and Creating Structs
+
