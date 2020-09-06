@@ -687,3 +687,26 @@ A *struct* is a custom data type. It is like an object's data attributes if you'
 
 ### Defining and Creating Structs
 
+Structs are similar to tuples. They both can contain elements of different types. In struct, these elements are named. To define the struct:
+
+```rust
+struct User {
+    username: String, //This is a field
+    email: String,
+    sign_in_count: u64,
+    active: bool,
+}
+```
+
+We create an *instance* of a struct by defining each of the *fields*.
+
+```rust
+let user1 = User {
+    email: String::from("someone@example.com"),
+    username: String::from("someusername123"),
+    active: true,
+    sign_in_count: 1,
+};
+```
+
+The order doesn't matter, because the fields are named. (An advantage over tuples.)
