@@ -799,3 +799,80 @@ The examples above, the fields are owned by the struct. We can have structs with
 ### An Example Program
 
 [Example Programs](src/ch-5)
+
+### Method Syntax
+
+#### Defining Methods
+
+Let's modify the example in the previous section:
+
+```rust
+#[derive(Debug)]
+struct Rect {
+    width: u32,
+    height: u32,
+}
+
+impl Rect {
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+}
+
+fn main() {
+    let rect1 = Rect {
+        width: 30,
+        height: 50,
+    };
+
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        rect1.area()
+    );
+}
+```
+
+To define the function within a context of `Rect`, we have to define an `impl` (implementation) block. We move the `area` function to this block and change the param to be `self`.
+
+We use `self` instead of `rect: &Rect` because Rust knows the type for `&self`. (We still need to pass in a reference because methods can take ownership, reference immutably, or reference mutably.)
+
+Having a method that takes ownership is rare. Usually we see this only when the method transforms `self` into something else and you want to prevent the caller from using the original.
+
+#### Methods with More Parameters
+
+If you want to use more parameters:
+
+```rust
+impl Rect {
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+
+    fn can_hold(&self, other: &Rectangle) -> bool {
+        self.width > other.width && self.height > other.height
+    }
+}
+```
+
+#### Associated Functions
+
+We can define functions that do not take in `self` in the `impl` block. These are called *associated functions* because they are associated with the struct. They are functions, not methods because they are not associated with an instance. `String::from` is an example.
+
+Associated functions are often used for constructors:
+
+```rust
+impl Rect {
+    fn square(size: u32) -> Rect {
+        Rect {
+            width: size,
+            height: size,
+        }
+    }
+}
+```
+
+To call an associated function, we use `::` - `let sq = Rect::square(3);`
+
+#### Multiple Impl Blocks
+
+We have multiple `impl` blocks, and all will be considered. Not sure why we'd want to do this, but it is possible.
