@@ -710,3 +710,92 @@ let user1 = User {
 ```
 
 The order doesn't matter, because the fields are named. (An advantage over tuples.)
+
+We can use dot notation to get specific attributes from a struct (`user1.email`). If this is mutable we can change it via this way of accessing:
+
+```rust
+user1.email = String::from("anotheremail@example.com")
+```
+
+The **entire struct must be mutable**. We cannot mark specific fields as mutable.
+
+#### Using the Field Init Shorthand when Variables and Fields Have the Same Name
+
+Let's say we have a function:
+
+```rust
+fn build_user(email: String, username: String) -> User {
+    User {
+        email: email,
+        username: username,
+        active: true,
+        sign_in_count: 1,
+    }
+}
+```
+
+we can just simply have it to be:
+
+```rust
+fn build_user(email: String, username: String) -> User {
+    User {
+        email,
+        username,
+        active: true,
+        sign_in_count: 1,
+    }
+}
+```
+
+#### Creating Instances From Other Instances With Struct Update Syntax
+
+There will be cases where we want to create a struct with most of an old struct's field with some changed. We can use the *struct update syntax*.
+
+Instead of:
+
+```rust
+let user2 = User {
+    email: String::from("another@example.com"),
+    username: String::from("anotherusername567"),
+    active: user1.active,
+    sign_in_count: user1.sign_in_count,
+};
+```
+
+we can have:
+
+```rust
+let user2 = User {
+    email: String::from("another@example.com"),
+    username: String::from("anotherusername567"),
+    ..user1
+};
+```
+
+The `..` specifies that the remaining fields not set should have the same values as the fields in the given instance.
+
+#### Using Tuple Structs without Named Fields to Create Different Types
+
+You can define structs that look like tupes, called *tupled structs*. They do not have names associated to the fields, rather they types associated to the fields. This is useful when you want to give a tuple a meaning, and make it a different type from other tupes, where field names are redundant.
+
+```rust
+fn main() {
+    struct Color(i32, i32, i32);
+    struct Point(i32, i32, i32);
+
+    let black = Color(0, 0, 0);
+    let origin = Point(0, 0, 0);
+}
+```
+
+#### Unit-Like Structs Without Any Fields
+
+You can have structs without any fields. This is useful for when you want to implement a trait that doesn't any data itself.
+
+#### Ownership of Struct Data
+
+The examples above, the fields are owned by the struct. We can have structs with fields that are owned by something else, but to do so we need to use *lifetimes*. Lifetimes esnure that the data references by a struct is valid for as long as the struct is. This will be further explained later.
+
+### An Example Program
+
+[Example Programs](src/ch-5)
