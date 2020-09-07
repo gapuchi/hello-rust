@@ -876,3 +876,51 @@ To call an associated function, we use `::` - `let sq = Rect::square(3);`
 #### Multiple Impl Blocks
 
 We have multiple `impl` blocks, and all will be considered. Not sure why we'd want to do this, but it is possible.
+
+## Enums and Pattern Matching
+
+### Defining an Enum
+
+```rust
+enum IpAddrKind {
+    V4,
+    V6,
+}
+```
+
+#### Enum Values
+
+We can create instances like this:
+
+```rust
+let four = IpAddrKind::V4;
+let six = IpAddrKind::V6;
+```
+
+We can store additional data inside enums:
+
+```rust
+enum IpAddr {
+    V4(String),
+    V6(String),
+}
+
+let home = IpAddr::V4(String::from("127.0.0.1"));
+
+let loopback = IpAddr::V6(String::from("::1"));
+```
+
+One cool advantage, each instance can have different types of data associated with it:
+
+```rust
+enum IpAddr {
+    V4(u8, u8, u8, u8),
+    V6(String),
+}
+
+let home = IpAddr::V4(127, 0, 0, 1);
+
+let loopback = IpAddr::V6(String::from("::1"));
+```
+
+There is a [standard library](https://doc.rust-lang.org/std/net/enum.IpAddr.html) for this!
