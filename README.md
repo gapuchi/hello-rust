@@ -1197,3 +1197,169 @@ Couple of things to note here:
 For example, the `rand` crate provides the functionality of generating random numbers. We can use this by bringing `rand` crate into our project's scope. All functionality can be through the crate's name, `rand`.
 
 Keeping a crate's functionality in its own scope prevents conflicts. For example, `rand` provides a trait `Rng`. We can also create a struct `Rng` in our own crate. We can bring in `rand` as a dependency and the compiler wouldn't be confused on which `Rng` we're using. In our crate it refers to our struct `Rng`. If we wanted to use the one in `rand`, we'd access it by saying `rand::Rng`.
+
+### Defining Modules to Control Scope and Privacy
+
+**Modules** let us organize code within a crate into groups for readability and easy reuse. It also controls **privacy**.
+
+Example, a module for restaurant functionality. We create `src/lib.rs` to create a library crate. Inside this class, we can define modules and functions:
+
+```rust
+// src/lib.rs
+mod front_of_house {
+    mod hosting {
+        fn add_to_waitlist() {}
+
+        fn seat_at_table {}
+    }
+
+    mod serving {
+        fn take_order() {}
+
+        fn serve_order() {}
+
+        fn take_payment() {}
+    }
+}
+```
+
+We use `mod` keyword to define a module and use `{}` to define the mody of the module. 
+
+Inside a module, we can define other modules and hold definitions for other items, such as structs, enums, constants, traits, or functions.
+
+You know how `src/lib.rs` and `src/main.rs` are called *crate root*s? This is because the contents of these files form the a module called `crate` that is at the root of the module tree.
+
+```rust
+crate
+ └── front_of_house
+     ├── hosting
+     │   ├── add_to_waitlist
+     │   └── seat_at_table
+     └── serving
+         ├── take_order
+         ├── serve_order
+         └── take_payment
+```
+
+Things to note:
+
+1. `hosting` *nests* inside `front_of_house`
+1. `hosting` is *siblings* with `serving`
+1. `hosting` is the *child* of `front_of_house`
+1. `front_of_house` is the *parent* of `hosting`
+
+### Paths for Referring to an Item in the Module Tree
+
+We use paths to find an item in the module tree structure.
+
+A path can take two forms:
+
+1. *Absolute path* - starts from a crate root by using a crate name or a literal `crate`
+1. *Relative path* - starts from the current module and uses `self`, `super`, or an identifier in the current module.
+
+The identifiers are separated by `::` in a path.
+
+So if we wanted to access `add_to_waitlist` from the root:
+
+```rust
+mod front_of_house { ... }
+
+pub fn eat_at_restaurant() {
+    //absolute path
+    crate::front_of_house::hosting::add_to_waitlist();
+
+    //relative path
+    front_of_house::hosting::add_to_waitlist();
+}
+```
+
+This actually won't compile because **`hosting` is private**.
+
+* Modules define privacy boundaries. All items are private by default.
+* Parent modules cannot access private items inside child modules
+* Child modules can access private items in their ancestor modules.
+    * This is because child hides implementation from the parent, but the child is aware of the context they're defined in.
+* Use `pub` to make an item public.
+
+#### Exposing Paths with the pub Keyword
+
+Let's make that function accessible:
+
+```rust
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+pub fn eat_at_restaurant() {
+    // Absolute path
+    crate::front_of_house::hosting::add_to_waitlist();
+
+    // Relative path
+    front_of_house::hosting::add_to_waitlist();
+}
+```
+
+Note:
+
+* We had to make both the `hosting` and `add_to_waitlist` public.
+* We didn't have to make `front_of_house` public. `eat_at_restaurant` is siblings with `front_of_house` so it can access it.
+
+#### Starting Relative Paths with `super`
+
+tldr - use `super` to up one module when using relative paths.
+
+#### Making Structs and Enums Public
+
+We use `pub` to make structs and enum public. Things to note:
+
+1. Marking a struct public doesn't make the fields public. We have to mark whichever fields we want to be public with `pub` as well.
+1. If a struct has private fields, it needs a public associated function that constructs an instance of the struct.
+    1. Otherwise we can't create an instance outside of the module. (Is this required if we don't want to access it outside of the module? My guess is it is because why else would we mark the struct as `pub`?)
+
+```rust
+mod back_of_house {
+    pub struct Breakfast {
+        pub toast: String,
+        seasonal_fruit: String,
+    }
+
+    impl Breakfast {
+        pub fn summer(toast: &str) -> Breakfast {
+            Breakfast {
+                toast: String::from(toast),
+                seasonal_fruit: String::from("peaches"),
+            }
+        }
+    }
+}
+
+pub fn eat_at_restaurant() {
+    // Order a breakfast in the summer with Rye toast
+    let mut meal = back_of_house::Breakfast::summer("Rye");
+    // Change our mind about what bread we'd like
+    meal.toast = String::from("Wheat");
+    println!("I'd like {} toast please", meal.toast);
+
+    // The next line won't compile if we uncomment it; we're not allowed
+    // to see or modify the seasonal fruit that comes with the meal
+    // meal.seasonal_fruit = String::from("blueberries");
+}
+```
+
+1. Marking an enum public makes all its variants public. You only need to mark the enum as `pub`.
+
+```rust
+mod back_of_house {
+    pub enum Appetizer {
+        Soup,
+        Salad,
+    }
+}
+
+pub fn eat_at_restaurant() {
+    let order1 = back_of_house::Appetizer::Soup;
+    let order2 = back_of_house::Appetizer::Salad;
+}
+```
