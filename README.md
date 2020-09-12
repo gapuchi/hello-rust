@@ -1363,3 +1363,194 @@ pub fn eat_at_restaurant() {
     let order2 = back_of_house::Appetizer::Salad;
 }
 ```
+
+### Bringing Paths into Scope with the `use` Keyword
+
+Instead of declaring the whole path each time we want to use an item, we can bring the path into scope with `use`.
+
+```rust
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+use crate::front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+}
+```
+
+With this, `hosting` can be treated as if *it was defined in the scope*
+
+You can also use with relative paths.
+
+#### Creating Idiomatic use Paths
+
+Why not specify the `use` path all the way to `add_to_waitlist`? *This is possible*, but the **idiomatic way is to bring the module into scope, not the function**. This way we can make it apparent that the function isn't defined in the scope.
+
+**The idiomatic way to bring in strucst, enums, and other items is to use the full path**. Weird right?
+
+There really isn't a reason, just the convention that formed.
+
+The only limitation is that we can't bring two items with the same name into the same scope:
+
+```rust
+use std::fmt;
+use std::io;
+
+fn function1() -> fmt::Result {
+    // --snip--
+    Ok(())
+}
+
+fn function2() -> io::Result<()> {
+    // --snip--
+    Ok(())
+}
+}
+```
+
+We clarify `Result` by using the `fmt` or `io` module. We couldn't do 
+
+```rust
+use std::fmt::Result;
+use std::io::Result;
+```
+
+because Rust wouldn't know which one to use if we were to refer to `Result`.
+
+#### Providing New Names with the as Keyword
+
+A work around to bring in items with the same name is to rename an item with `as` keyworkd:
+
+```rust
+use std::fmt::Result;
+use std::io::Result as IoResult;
+```
+
+#### Re-exporting Names with pub use
+
+* `use` brings a name into the scope, but the name is private
+* If we want to allow external code to access this name in given module, we can slap on a `pub` in front of `use`
+
+```rust
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+pub use crate::front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+}
+```
+
+Things to note:
+
+1. External code can call `add_to_waitlist` by `hosting::add_to_waitlist`.
+1. External code *cannot* call `add_to_waitlist` because `front_of_house` is not public.
+
+<dl>
+    <dt>When to use?</dt>
+    <dd>The internal structure of your code differs from how users would think about the domain. (e.g. users wouldn't not distinguish "back of house" and "front of house")</dd>
+</dl>
+
+#### Using External Packages
+
+To use (for example) `rand` package, we add this line to *Cargo.toml*:
+
+```rust
+[dependencies]
+rand = "0.0.5"
+```
+
+then to bring `rand` into scope, we add a `use` line:
+
+```rust
+use rand::Rng; //Starts with the crate name (rand) and then followed by the item/module etc.
+```
+
+`std` (standard library) is an external package that is shipped with Rust, so we do not neet to declare it as a dependency, but we do need to declare a `use` statement if we want to use something from it.
+
+#### Using Nested Paths to Clean Up Large `use` Lists
+
+```rust
+use std::cmp::Ordering;
+use std::io;
+```
+
+can be simplified to:
+
+```rust
+use std::{cmp::Ordering, io};
+```
+
+and
+
+```rust
+use std::io;
+use std::io::Write;
+```
+
+can be simplified to:
+
+```rust
+use std::io::{self, Write};
+```
+
+#### Glob Operator
+
+If we want to bring in all public items in a path, use `*` (the *glob operator*):
+
+```rust
+use std::collections::*;
+```
+
+### Separating Modules into Different Files
+
+We want to split modules into different files when it gets too big.
+
+Let's move `front_of_house` into its own file. We create `src/front_of_house.rs`:
+
+```rust
+pub mod hosting {
+    pub fn add_to_waitlist() {}
+}
+```
+
+and change `src/lib.rs` to be:
+
+```rust
+mod front_of_house; //The semi-colon instead of a body tells Rust to load the contents from another file with the same name as the module.
+
+pub use crate::front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+}
+```
+
+Let's extract `hosting` to its own file:
+
+```rust
+// src/front_of_house.rs
+pub mod hosting;
+```
+
+and we create `src/front_of_house/hosting.rs`:
+
+```rust
+pub fn add_to_waitlist() {}
+```
+
+A way to think about the structure is to look at the path: `crate::front_of_housing::hosting` can be converted to `src/front_of_housing/hosting.rs`.
