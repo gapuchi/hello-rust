@@ -1118,3 +1118,82 @@ if let Coin::Quarter(state) = coin {
     count += 1;
 }
 ```
+
+## Managing Growing Projects with Packages, Crates, and Modules
+
+* So far we've written code in one **module** in one **file**.
+* As code gets bigger, we can split our code into multiple modules and then in multiple files.
+* **Package** contains **multiple binary crater** and **optionally one library crate**. (Why only one library? Idk).
+* As your project grows, you can split code into different crates.
+* This leads to the concept of **scope**. The context where code is written has a set of names that are defined as *in scope*. You can create scopes and change which names are in and out of the scope. You can't have two itesm with the same name in the same scope.
+
+Rust provides introduces various tools:
+
+<dl>
+    <dt>Packages</dt>
+    <dd>A Cargo feature that lets you build, test, and share crates</dd>
+    <dt>Crates</dt>
+    <dd>A tree of modules that produces a library or executable</dd>
+    <dt>Modules, use</dt>
+    <dd>Lets you control the organization, scope, and privacy of paths</dd>
+    <dt>Paths</dt>
+    <dd>A way of naming an item, such as a struct, function, or module</dt>
+</dl>
+
+### Packages and Crates
+
+<dl>
+    <dt>Crate</dt>
+    <dd>A binary or library</dd>
+    <dt>crate root</dt>
+    <dd>A source file that the Rust compiler starts from and makes up the root module of your crate.</dd>
+    <dt>Package</dt>
+    <dd>One or more crates that provide a set of functionality. It contains a *Cargo.toml* file that explains how to build these crates.</dd>
+</dl>
+
+A *package*:
+
+1. **Must contain** at least one crate (either a library crate or binary crate)
+1. Cannot contain more than one library crate
+1. Can contain as many binary crates as you want
+
+Let's create a new project:
+
+```zsh
+~ $ cargo new my-new-project
+     Created binary (application) `my-new-project` package
+~ $ ls my-new-project 
+Cargo.toml src
+~ $ ls my-new-project/src
+main.rs
+~ $ cat my-new-project/Cargo.toml 
+[package]
+name = "my-new-project"
+version = "0.1.0"
+authors = ["Spongebob Squarepants <bob.sponge@krustykrab.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+~ $
+```
+
+Couple of things to note here:
+
+1. There is a *Cargo.toml* file, indicating that this is a package.
+1. *Cargo.toml* has no mention of `src/main.rs`. Cargo follows the convention of:
+    * `src/main.rs` - crate root of a binary crate with the same name as the package.
+    * `src/lib.rs,` - crate root of a library crate with the same name as the package.
+1. Cargo passes the crate root files to `rustc` to build the library or binary.
+1. This package only has `src/main.rs` so it only contains a binary crate named `my-project`.
+1. If the package contains both `src/main.rs` and `src/lib.rs`, it has two crates:
+    1. A binary crate named `my-project`
+    1. A library crate named `my-project`
+1. A package can have multiple binary crates by placing files under `src/bin`. Each file is a separate binary crate.
+
+*A crate will group related functionality together in a scope so its easy to share among projects.*
+
+For example, the `rand` crate provides the functionality of generating random numbers. We can use this by bringing `rand` crate into our project's scope. All functionality can be through the crate's name, `rand`.
+
+Keeping a crate's functionality in its own scope prevents conflicts. For example, `rand` provides a trait `Rng`. We can also create a struct `Rng` in our own crate. We can bring in `rand` as a dependency and the compiler wouldn't be confused on which `Rng` we're using. In our crate it refers to our struct `Rng`. If we wanted to use the one in `rand`, we'd access it by saying `rand::Rng`.
