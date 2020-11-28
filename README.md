@@ -1,8 +1,6 @@
-# Notes
-
 This repo contains the code snippets and notes I have written/taken from [The Rust Book](https://doc.rust-lang.org/book/).
 
-## Variable and Mutability
+# Variable and Mutability
 
 `let` declares a variable. This is **immutable** by default. If you want to make it mutable, add `mut` keyword:
 
@@ -36,7 +34,7 @@ x = 7; //No error
 x = "howdy"; //Error
 ```
 
-## Data Types
+# Data Types
 
 Rust is **statically typed**, which means it knows all the types at compile time. The compiler can infer (usually) what type a variable is, but there are cases where it cannot.
 
@@ -48,7 +46,7 @@ let guess: u32 = "42".parse().expect("Not a number!");
 
 Without the declared type, compiler will throw an error.
 
-### Scalar Types
+## Scalar Types
 
 **Scalar types** represent a single value. Rust has four primary scalar types:
 
@@ -57,14 +55,14 @@ Without the declared type, compiler will throw an error.
 1. boolean
 1. characters
 
-### Compound Types
+## Compound Types
 
 **Compound types** can group multiple values into one type. Rust has two primary compound types:
 
 1. Tuple
 1. Array
 
-## Functions
+# Functions
 
 * Statement - instructions that perform some action and do not return a value.
 * Expression - evaluate to a resulting value.
@@ -100,9 +98,9 @@ The above expression evaluates to `3`.
 
 **Expressions do not include semi-colons.** If you add a semi-colon, it becomes a statement and will not return a value.
 
-## Control Flow
+# Control Flow
 
-### `if` Expressions
+## `if` Expressions
 
 `if` statements are pretty common:
 
@@ -129,7 +127,7 @@ fn main() {
 }
 ```
 
-### `loop`
+## `loop`
 
 `loop` runs code repeatedly until there is a command to break:
 
@@ -151,7 +149,7 @@ fn main() {
 
 The `break` keyword can be followed by an expression that is returned from the loop. A `;` follows the `loop` block because it is a statement of assigning a variable.
 
-### `while`
+## `while`
 
 `while` loop is straighforward:
 
@@ -169,7 +167,7 @@ fn main() {
 }
 ```
 
-### `for`
+## `for`
 
 `for` loop is straightforward:
 
@@ -182,7 +180,7 @@ fn main() {
 }
 ```
 
-## Ownership
+# Ownership
 
 **Ownership Rules**:
 
@@ -190,7 +188,7 @@ fn main() {
 1. There can only be one owner at a time.
 1. When the owner goes out of scope, the value will be dropped.
 
-### Variable Scope
+## Variable Scope
 
 ```rust
 let s = "hello";
@@ -206,7 +204,7 @@ The variable is valid from the point at which it’s declared until the end of t
 } //end of scope, s is invalid
 ```
 
-### The `String` Type - An Example
+## The `String` Type - An Example
 
 The data types mentioned above are stored on the stack and are popped off when moved out of scope. Let's take a look at an example of something stored on the *heap*.
 
@@ -228,7 +226,7 @@ println!("{}", s); // This will print `hello, world!`
 
 Why can this be mutated but not literals? This can be explained by how these are stored.
 
-### Memory and Allocation
+## Memory and Allocation
 
 With a string literal, we know the contents at compile time. The text is hardcoded directly into the final executable. We can do this because a **literal is immuatable**. We cannot allocate memory for each text that we do not know the size of, or those that might change.
 
@@ -255,7 +253,7 @@ fn main() {
 
 When a variable goes out of scope, Rust calls a special function, `drop`. The author of `String` puts the code to return the memory in this method. Rust calls it automatically.
 
-#### Ways Variables and Data Interact: Move
+### Ways Variables and Data Interact: Move
 
 Multiple variables can interact with the same data:
 
@@ -298,7 +296,7 @@ fn main() {
 
 Instead of a *shallow copy*, where the pointer is copied, this is a **move** because `s1` is invalidated. `s1` was *moved* to `s2`. Rust will never automatically *deep copy* your data, as this is expensive.
 
-#### Ways Variables and Data Interact: Clone
+### Ways Variables and Data Interact: Clone
 
 If we want to do a **deep copy**, we can use a common method called **clone**:
 
@@ -311,7 +309,7 @@ fn main() {
 }
 ```
 
-#### Stack-Only Data: Copy
+### Stack-Only Data: Copy
 
 You know what's weird:
 
@@ -328,7 +326,7 @@ The above doesn't error. Didn't `x` move to `y`? Well this these data types have
 
 Rust has a `Copy` trait that we can put on data types such as integers. If a type has a `Copy` trait, the older variable is still usable after reassignment. Rust won't let us annotate a type with `Copy` trait if the type or any part of it has implemented the `Drop` trait.
 
-### Ownership and Functions
+## Ownership and Functions
 
 Passing a value to the function similar is assigning:
 
@@ -360,7 +358,7 @@ fn makes_copy(some_integer: i32) { // some_integer comes into scope
 
 * `s` is moved to `some_string`. We cannot use `s` after this.
 
-### Return Values and Scope
+## Return Values and Scope
 
 ```rust
 fn main() {
@@ -414,7 +412,7 @@ fn calculate_length(s: String) -> (String, usize) {
 
 It is extra code and an extra process. For these cases, Rust has a concept called *references*.
 
-### References and Borrowing
+## References and Borrowing
 
 Here's how a function would take a parameter as a reference without taking ownership:
 
@@ -442,7 +440,7 @@ Having references as function parameters is called **borrowing**. Because the fu
 
 References are immutable, like variables are by default.
 
-#### Mutable References
+### Mutable References
 
 To make a reference mutable, we have to:
 
@@ -525,12 +523,12 @@ fn main() {
 }
 ```
 
-#### To Summarize
+### To Summarize
 
 1. You can either have one mutable or any number of immutable references.
 1. References must always be valid.
 
-### The Slice Type
+## The Slice Type
 
 An example - Write a function that takes a string and returns the first word it finds in that string. If no word is found, then the whole string should be returned.
 
@@ -577,7 +575,7 @@ This compiles without any issues. We need to worry about keeping `word` in sync 
 
 The solution? String slices
 
-#### String Slices
+### String Slices
 
 **Slice** references a sequence of elements in a collection, instead of a whole collection. It **does not have ownership**.
 
@@ -626,7 +624,7 @@ fn main() {
 
 Rust doesn't let you have a mutable reference if you already have an immutable reference. `clear` needs a mutable reference (because it is modifying the string), but we passed an immutable reference to `first_word`.
 
-#### String Literals Are Slices
+### String Literals Are Slices
 
 ```rust
 let s = "Hello, world!";
@@ -634,7 +632,7 @@ let s = "Hello, world!";
 
 Recall string literals being stored inside the binary. The type of `s` here is `&str`: it’s a slice pointing to that specific point of the binary. This is also why string literals are immutable; `&str` is an immutable reference.
 
-#### String Slices as Parameters
+### String Slices as Parameters
 
 One improvement to the signature:
 
@@ -670,7 +668,7 @@ fn main() {
 }
 ```
 
-#### Other Slices
+### Other Slices
 
 We can take a slice of arrays besides strings:
 
@@ -681,11 +679,11 @@ let slice = &a[1..3];
 
 The slice has the type `&[i32]`.
 
-## Using Structs to Structure Related Data
+# Using Structs to Structure Related Data
 
 A *struct* is a custom data type. It is like an object's data attributes if you're thinking about object-oriented programming.
 
-### Defining and Creating Structs
+## Defining and Creating Structs
 
 Structs are similar to tuples. They both can contain elements of different types. In struct, these elements are named. To define the struct:
 
@@ -719,7 +717,7 @@ user1.email = String::from("anotheremail@example.com")
 
 The **entire struct must be mutable**. We cannot mark specific fields as mutable.
 
-#### Using the Field Init Shorthand when Variables and Fields Have the Same Name
+### Using the Field Init Shorthand when Variables and Fields Have the Same Name
 
 Let's say we have a function:
 
@@ -747,7 +745,7 @@ fn build_user(email: String, username: String) -> User {
 }
 ```
 
-#### Creating Instances From Other Instances With Struct Update Syntax
+### Creating Instances From Other Instances With Struct Update Syntax
 
 There will be cases where we want to create a struct with most of an old struct's field with some changed. We can use the *struct update syntax*.
 
@@ -774,7 +772,7 @@ let user2 = User {
 
 The `..` specifies that the remaining fields not set should have the same values as the fields in the given instance.
 
-#### Using Tuple Structs without Named Fields to Create Different Types
+### Using Tuple Structs without Named Fields to Create Different Types
 
 You can define structs that look like tupes, called *tupled structs*. They do not have names associated to the fields, rather they types associated to the fields. This is useful when you want to give a tuple a meaning, and make it a different type from other tupes, where field names are redundant.
 
@@ -788,26 +786,26 @@ fn main() {
 }
 ```
 
-#### Unit-Like Structs Without Any Fields
+### Unit-Like Structs Without Any Fields
 
 You can have structs without any fields. This is useful for when you want to implement a trait that doesn't any data itself.
 
-#### Ownership of Struct Data
+### Ownership of Struct Data
 
 The examples above, the fields are owned by the struct. We can have structs with fields that are owned by something else, but to do so we need to use *lifetimes*. Lifetimes esnure that the data references by a struct is valid for as long as the struct is. This will be further explained later.
 
-### An Example Program
+## An Example Program
 
 [Example Programs](src/ch-5)
 
-### Method Syntax
+## Method Syntax
 
-#### Defining Methods
+### Defining Methods
 
 Let's modify the example in the previous section:
 
 ```rust
-#[derive(Debug)]
+[derive(Debug)]
 struct Rect {
     width: u32,
     height: u32,
@@ -838,7 +836,7 @@ We use `self` instead of `rect: &Rect` because Rust knows the type for `&self`. 
 
 Having a method that takes ownership is rare. Usually we see this only when the method transforms `self` into something else and you want to prevent the caller from using the original.
 
-#### Methods with More Parameters
+### Methods with More Parameters
 
 If you want to use more parameters:
 
@@ -854,7 +852,7 @@ impl Rect {
 }
 ```
 
-#### Associated Functions
+### Associated Functions
 
 We can define functions that do not take in `self` in the `impl` block. These are called *associated functions* because they are associated with the struct. They are functions, not methods because they are not associated with an instance. `String::from` is an example.
 
@@ -873,13 +871,13 @@ impl Rect {
 
 To call an associated function, we use `::` - `let sq = Rect::square(3);`
 
-#### Multiple Impl Blocks
+### Multiple Impl Blocks
 
 We have multiple `impl` blocks, and all will be considered. Not sure why we'd want to do this, but it is possible.
 
-## Enums and Pattern Matching
+# Enums and Pattern Matching
 
-### Defining an Enum
+## Defining an Enum
 
 ```rust
 enum IpAddrKind {
@@ -888,7 +886,7 @@ enum IpAddrKind {
 }
 ```
 
-#### Enum Values
+### Enum Values
 
 We can create instances like this:
 
@@ -970,7 +968,7 @@ let m = Message::Write(String::from("hello"))
 m.call()
 ```
 
-#### The `Option` Enum and Its Advantage Over Null Values
+### The `Option` Enum and Its Advantage Over Null Values
 
 Basically, the argument for `Option` in Scala. Rust has defined its own [Option](https://doc.rust-lang.org/std/option/enum.Option.html):
 
@@ -983,7 +981,7 @@ enum Option<T> {
 
 `Option<T>` is an enum, and `Some(T)` and `None` are variants of the enum. (`<T>` is the syntax for generics. Later chapter.)
 
-### The `match` Control Flow Operator
+## The `match` Control Flow Operator
 
 Basically the `match` in Scala.
 
@@ -1005,7 +1003,7 @@ fn value_in_cents(coin: Coin) -> u8 {
 }
 ```
 
-#### Pattern that Bind to Value
+### Pattern that Bind to Value
 
 We can extract values using `match`, kinda like how we can extract values from `case class`es in Scala.
 
@@ -1042,7 +1040,7 @@ fn value_in_cents(coin: Coin) -> u8 {
 }
 ```
 
-#### Matching with `Option<T>`
+### Matching with `Option<T>`
 
 ```rust
 fn plus_one(x: Option<i32>) -> Option<i32> {
@@ -1057,7 +1055,7 @@ let six = plus_one(five);
 let none = plus_one(None);
 ```
 
-#### Matches Are Exhaustive
+### Matches Are Exhaustive
 
 **Unlike Scala**, matches in Rust **has to be exhaustive**. There will be a compile error if it isn't:
 
@@ -1069,7 +1067,7 @@ fn plus_one(x: Option<i32>) -> Option<i32> {
 } //Won't compile
 ```
 
-#### The `_` Placeholder
+### The `_` Placeholder
 
 Similar to Scala, `_` can be used as a catch all:
 
@@ -1084,7 +1082,7 @@ match some_u8_value {
 }
 ```
 
-### Concise Control Flow with `if let`
+## Concise Control Flow with `if let`
 
 Rust combines `if` and `let` to allow a more concise way to handle values that match one pattern while ignoring the rest.
 
@@ -1119,7 +1117,7 @@ if let Coin::Quarter(state) = coin {
 }
 ```
 
-## Managing Growing Projects with Packages, Crates, and Modules
+# Managing Growing Projects with Packages, Crates, and Modules
 
 * So far we've written code in one **module** in one **file**.
 * As code gets bigger, we can split our code into multiple modules and then in multiple files.
@@ -1140,7 +1138,7 @@ Rust provides introduces various tools:
     <dd>A way of naming an item, such as a struct, function, or module</dt>
 </dl>
 
-### Packages and Crates
+## Packages and Crates
 
 <dl>
     <dt>Crate</dt>
@@ -1173,7 +1171,7 @@ version = "0.1.0"
 authors = ["Spongebob Squarepants <bob.sponge@krustykrab.com>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+ See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 ~ $
@@ -1198,7 +1196,7 @@ For example, the `rand` crate provides the functionality of generating random nu
 
 Keeping a crate's functionality in its own scope prevents conflicts. For example, `rand` provides a trait `Rng`. We can also create a struct `Rng` in our own crate. We can bring in `rand` as a dependency and the compiler wouldn't be confused on which `Rng` we're using. In our crate it refers to our struct `Rng`. If we wanted to use the one in `rand`, we'd access it by saying `rand::Rng`.
 
-### Defining Modules to Control Scope and Privacy
+## Defining Modules to Control Scope and Privacy
 
 **Modules** let us organize code within a crate into groups for readability and easy reuse. It also controls **privacy**.
 
@@ -1248,7 +1246,7 @@ Things to note:
 1. `hosting` is the *child* of `front_of_house`
 1. `front_of_house` is the *parent* of `hosting`
 
-### Paths for Referring to an Item in the Module Tree
+## Paths for Referring to an Item in the Module Tree
 
 We use paths to find an item in the module tree structure.
 
@@ -1281,7 +1279,7 @@ This actually won't compile because **`hosting` is private**.
     * This is because child hides implementation from the parent, but the child is aware of the context they're defined in.
 * Use `pub` to make an item public.
 
-#### Exposing Paths with the pub Keyword
+### Exposing Paths with the pub Keyword
 
 Let's make that function accessible:
 
@@ -1306,11 +1304,11 @@ Note:
 * We had to make both the `hosting` and `add_to_waitlist` public.
 * We didn't have to make `front_of_house` public. `eat_at_restaurant` is siblings with `front_of_house` so it can access it.
 
-#### Starting Relative Paths with `super`
+### Starting Relative Paths with `super`
 
 tldr - use `super` to up one module when using relative paths.
 
-#### Making Structs and Enums Public
+### Making Structs and Enums Public
 
 We use `pub` to make structs and enum public. Things to note:
 
@@ -1364,7 +1362,7 @@ pub fn eat_at_restaurant() {
 }
 ```
 
-### Bringing Paths into Scope with the `use` Keyword
+## Bringing Paths into Scope with the `use` Keyword
 
 Instead of declaring the whole path each time we want to use an item, we can bring the path into scope with `use`.
 
@@ -1388,7 +1386,7 @@ With this, `hosting` can be treated as if *it was defined in the scope*
 
 You can also use with relative paths.
 
-#### Creating Idiomatic use Paths
+### Creating Idiomatic use Paths
 
 Why not specify the `use` path all the way to `add_to_waitlist`? *This is possible*, but the **idiomatic way is to bring the module into scope, not the function**. This way we can make it apparent that the function isn't defined in the scope.
 
@@ -1423,7 +1421,7 @@ use std::io::Result;
 
 because Rust wouldn't know which one to use if we were to refer to `Result`.
 
-#### Providing New Names with the as Keyword
+### Providing New Names with the as Keyword
 
 A work around to bring in items with the same name is to rename an item with `as` keyworkd:
 
@@ -1432,7 +1430,7 @@ use std::fmt::Result;
 use std::io::Result as IoResult;
 ```
 
-#### Re-exporting Names with pub use
+### Re-exporting Names with pub use
 
 * `use` brings a name into the scope, but the name is private
 * If we want to allow external code to access this name in given module, we can slap on a `pub` in front of `use`
@@ -1463,7 +1461,7 @@ Things to note:
     <dd>The internal structure of your code differs from how users would think about the domain. (e.g. users wouldn't not distinguish "back of house" and "front of house")</dd>
 </dl>
 
-#### Using External Packages
+### Using External Packages
 
 To use (for example) `rand` package, we add this line to *Cargo.toml*:
 
@@ -1480,7 +1478,7 @@ use rand::Rng; //Starts with the crate name (rand) and then followed by the item
 
 `std` (standard library) is an external package that is shipped with Rust, so we do not neet to declare it as a dependency, but we do need to declare a `use` statement if we want to use something from it.
 
-#### Using Nested Paths to Clean Up Large `use` Lists
+### Using Nested Paths to Clean Up Large `use` Lists
 
 ```rust
 use std::cmp::Ordering;
@@ -1506,7 +1504,7 @@ can be simplified to:
 use std::io::{self, Write};
 ```
 
-#### Glob Operator
+### Glob Operator
 
 If we want to bring in all public items in a path, use `*` (the *glob operator*):
 
@@ -1514,7 +1512,7 @@ If we want to bring in all public items in a path, use `*` (the *glob operator*)
 use std::collections::*;
 ```
 
-### Separating Modules into Different Files
+## Separating Modules into Different Files
 
 We want to split modules into different files when it gets too big.
 
@@ -1555,7 +1553,7 @@ pub fn add_to_waitlist() {}
 
 A way to think about the structure is to look at the path: `crate::front_of_housing::hosting` can be converted to `src/front_of_housing/hosting.rs`.
 
-## Error Handling
+# Error Handling
 
 In many occasions, Rust requires you to acknowledge the possibility of an error and take some action before your code will compile.
 
@@ -1566,7 +1564,7 @@ Rust groups errors into 2 main categories:
 
 Rust doesn't have exceptions. It has the type `Result<T, E>` for recoverable errors and the `panic!` macro that stops execution when the program encounters an unrecoverable error.
 
-### Unrecoverable Errors with `panic!`
+## Unrecoverable Errors with `panic!`
 
 When the `panic!` macro executes, your program will print a failure message, unwind and clean up the stack, and then quit.
 
@@ -1587,7 +1585,7 @@ fn main() {
 
 The error message will print the location of the `panic`.
 
-```
+```console
 $ cargo run
    Compiling panic v0.1.0 (file:///projects/panic)
     Finished dev [unoptimized + debuginfo] target(s) in 0.25s
@@ -1596,7 +1594,7 @@ thread 'main' panicked at 'crash and burn', src/main.rs:2:5
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace.
 ```
 
-#### Using a `panic!` Backtrace
+### Using a `panic!` Backtrace
 
 Let's take a look at an example where we do not throw the `panic`.
 
@@ -1610,7 +1608,7 @@ fn main() {
 
 This is essentially an index out of bounds exception in Java.
 
-```
+```console
 $ cargo run
    Compiling panic v0.1.0 (file:///projects/panic)
     Finished dev [unoptimized + debuginfo] target(s) in 0.27s
@@ -1627,7 +1625,7 @@ A **backtrace** is a list of all the functions that hav ebeen caleed to get to t
 
 If we set the environment variable, we can view this:
 
-```
+```console
 thread 'main' panicked at 'index out of bounds: the len is 3 but the index is 99', main.rs:4:5
 stack backtrace:
    0: _rust_begin_unwind
@@ -1641,7 +1639,7 @@ stack backtrace:
 note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
 ```
 
-### Recoverable Errors with `Result`
+## Recoverable Errors with `Result`
 
 All errors do not need a program to stop completely.
 
@@ -1689,7 +1687,7 @@ fn main() {
 
 > Note that, like the `Option` enum, the `Result` enum and its variants have been brought into scope by the prelude, so we don’t need to specify `Result::` before the `Ok` and `Err` variants in the match arms.
 
-#### Matching on Different Errors
+### Matching on Different Errors
 
 We may not want to `panic!` for every failure. Let's say we want to create a file if the file doesn't exist and `panic!` for other cases, like permission issue.
 
@@ -1740,7 +1738,7 @@ fn main() {
 
 (This may not make complete sense until we get to closures.) `unwrap_or_else` and other methods will help us get rid of nested `match` expressions when handling errors.
 
-#### Shortcuts for Pan on Error: `unwrap` and `expect`
+### Shortcuts for Pan on Error: `unwrap` and `expect`
 
 `match` is fine and dandy, but it gets verbose. There are helper methods to define varios tasks.
 
@@ -1756,14 +1754,14 @@ fn main() {
 
 If we run this with a `hello.txt` file:
 
-```
+```console
 thread 'main' panicked at 'called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "No such file or directory" }', main.rs:4:37
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 ```
 
 `expect` is similar to `unwrap`, but it also let's us choose the `panic!` error message:
 
-```
+```rust
 use std::fs::File;
 
 fn main() {
@@ -1773,14 +1771,14 @@ fn main() {
 
 The error we see on running:
 
-```
+```console
 thread 'main' panicked at 'Failed to open hello.txt: Os { code: 2, kind: NotFound, message: "No such file or directory" }', main.rs:4:37
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 ```
 
 This allows us to give meaningful error messages.
 
-#### Propagating Errors
+### Propagating Errors
 
 Sometimes, you want to handle the error outside of the function. This gives the callers of the function more control.
 
@@ -1815,7 +1813,7 @@ We propagate the errors because we do not know the context of reading a file. Do
 
 The concept of *propagating* is so common that Rust provides the `?` operator to make it easier.
 
-#### A Shortcut for Propagating Erros: the `?` Operator
+### A Shortcut for Propagating Erros: the `?` Operator
 
 Below is the same implementation as our previous example:
 
@@ -1868,7 +1866,7 @@ fn read_username_from_file() -> Result<String, io::Error> {
 
 Rust provides a `fs::read_to_string` function that creates a new `String`, read the contents of a file, puts it into the `String`, and returns it. (This didn't give us the chance of explaining the error handling obviously so we didn't go with this as our working example.)
 
-#### The `?` Operator Can Be Used in Functions That Return `Result`
+### The `?` Operator Can Be Used in Functions That Return `Result`
 
 The `?` operator can be used in functions that have a return type of `Result`. This is because the `?` operator works in the same way as the `match` expression - specifically `return Err(e)` logic. Therefore, the function using `?` must define `Err` as a return type to be compatible.
 
@@ -1884,7 +1882,7 @@ fn main() {
 
 with an error message containing:
 
-```
+```console
 the `?` operator can only be used in an async function that returns `Result` or `Option` (or another type that implements `std::ops::Try`)
 ```
 
@@ -1905,10 +1903,550 @@ fn main() -> Result<(), Box<dyn Error>> {
 
 The `Box<dyn Error>` type is called a trait object. We'll talk more about that later. Basically it just means "any kind of error".
 
-### To `panic!` or Not To `panic!`
+## To `panic!` or Not To `panic!`
 
 If you call `panic!`, you're making the decision on behalf of the code calling your code that a situation is unrecoverable, regardless of context. If you choose to return `Result`, you are giving the calling code options rather than making the decision for them. They can choose to `panic!` themselves, or handle the `Err`, or to propagate the `Err`. Any case, it provides flexibility. Returning `Result` is a good default choice.
 
 There are rare situations where `panic!` is more appropriate.
 
 (To Be Continued)
+
+# [Generic Types, Traits, and Lifetimes](https://doc.rust-lang.org/book/ch10-00-generics.html#generic-types-traits-and-lifetimes)
+
+For the sake of conciseness, I'm not explaining generics here. It is the same concept as in Java. This section will include Rust specific syntax and behaviors.
+
+## Generic Data Types
+
+### In Function Definitions
+
+```rust
+fn largest<T>(list: &[T]) -> &T {
+    let mut largest = &list[0];
+
+    for item in list {
+        if item > largest {
+            largest = item;
+        }
+    }
+
+    largest
+}
+
+fn main() {
+    let number_list = vec![34, 50, 25, 100, 65];
+
+    let result = largest(&number_list);
+    println!("The largest number is {}", result);
+
+    let char_list = vec!['y', 'm', 'a', 'q'];
+
+    let result = largest(&char_list);
+    println!("The largest char is {}", result);
+}
+```
+
+- `fn largest<T>` - declares a function called `largest` that has a generic type, `T`. 
+- `(list: &[T])` - states the method takes in a parameter that is a slice type with the contents of the slice being of type `T`
+- `-> &T` - declares the funtion returns a reference to a `T` type
+
+**This won't compile** because there is no guarantee that `T` has a `>` method implemented:
+
+```console
+$ cargo run
+   Compiling chapter10 v0.1.0 (file:///projects/chapter10)
+error[E0369]: binary operation `>` cannot be applied to type `T`
+ --> src/main.rs:5:17
+  |
+5 |         if item > largest {
+  |            ---- ^ ------- T
+  |            |
+  |            T
+  |
+  = note: `T` might need a bound for `std::cmp::PartialOrd`
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0369`.
+error: could not compile `chapter10`.
+
+To learn more, run the command again with --verbose.
+```
+
+We'll need to use a *trait*, which we'll get to in a moment.
+
+### In Struct Definitions
+
+We can also define structs using generics:
+
+```rust
+struct Point<T> {
+    x: T,
+    y: T,
+}
+
+fn main() {
+    let integer = Point { x: 5, y: 10 };
+    let float = Point { x: 1.0, y: 4.0 };
+}
+```
+
+### In Enum Definitions
+
+We can also define enums using generics:
+
+```rust
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+```
+
+We say that *"`Struct` is generic over two types, `T` and `E`"*.
+
+### In Method Definitions
+
+```rust
+struct Point<T> {
+    x: T,
+    y: T,
+}
+
+impl<T> Point<T> {
+    fn x(&self) -> &T {
+        &self.x
+    }
+}
+```
+
+We have to declare `<T>` after `impl` so we can say we're defining a method for a generic type. You could also define methods for a specific type:
+
+```rust
+impl Point<f32> {
+    fn distance_from_origin(&self) -> f32 {
+        (self.x.powi(2) + self.y.powi(2)).sqrt()
+    }
+}
+```
+
+The generics used in a struct doesn't necessarily match those used in the struct's method signatures:
+
+```rust
+struct Point<T, U> {
+    x: T,
+    y: U,
+}
+
+impl<T, U> Point<T, U> {
+    fn mixup<V, W>(self, other: Point<V, W>) -> Point<T, W> {
+        Point {
+            x: self.x,
+            y: other.y,
+        }
+    }
+}
+```
+
+### Performance of Code Using Generics
+
+Rust implements generics in a way that your code *doesn't run any slower using generics types than it would using concrete types*.
+
+It achieves this by performing *monomorphization* at compile type. 
+
+*Monomorphization* - process of turning generic code into specific code by filling in the concrete types that are used when compiled.
+
+Let's take a look at an example with the `Option` enum:
+
+```rust
+let integer = Some(5);
+let float = Some(5.0);
+```
+
+The compiler would see that the `Option` enum is being used for two types: `i32` and `f64`. It expands the definition of `Option<T>` into `Option_i32` and `Option_f64`.
+
+The compiled code will look like this, with `Option<T>` replaced:
+
+```rust
+enum Option_i32 {
+    Some(i32),
+    None,
+}
+
+enum Option_f64 {
+    Some(f64),
+    None,
+}
+
+fn main() {
+    let integer = Option_i32::Some(5);
+    let float = Option_f64::Some(5.0);
+}
+```
+
+## Traits: Defining Shared Behavior
+
+**Trait** - tells the Rust compiler about a functionality that a type has that can be shared with other types.
+
+We use traits to define shared behavior in an abstract way. We can use *trait bounds* to specific that a generic can be any type that has a certain behavior.
+
+> This is basically *interfaces* in Java, with some caveats.
+
+### Defining a Trait
+
+A type’s behavior consists of the methods we can call on that type. Different types share the same behavior if we can call the same methods on all of those types. Trait definitions are a way to group method signatures together to define a set of behaviors necessary to accomplish some purpose.
+
+```rust
+pub trait Summary {
+    fn summarize(&self) -> String;
+}
+```
+
+The methods have `;` at the end because the definition/implementation of the method will be defined by the types that implement this trait.
+
+### Implementing a Trait on a Type
+
+Implementing a trait on a type is similar to implementing regular methonds. The main difference is after `impl`, we put the trait name, then use the `for` keyword, and then specify the name of the type you want to implement the trait for.
+
+```rust
+pub struct NewsArticle {
+    pub headline: String,
+    pub location: String,
+    pub author: String,
+    pub content: String,
+}
+
+impl Summary for NewsArticle {
+    fn summarize(&self) -> String {
+        format!("{}, by {} ({})", self.headline, self.author, self.location)
+    }
+}
+
+pub struct Tweet {
+    pub username: String,
+    pub content: String,
+    pub reply: bool,
+    pub retweet: bool,
+}
+
+impl Summary for Tweet {
+    fn summarize(&self) -> String {
+        format!("{}: {}", self.username, self.content)
+    }
+}
+```
+
+We can then use `summarize` as if it was defined in the type:
+
+```rust
+let tweet = Tweet {
+    username: String::from("horse_ebooks"),
+    content: String::from(
+        "of course, as you probably already know, people",
+    ),
+    reply: false,
+    retweet: false,
+};
+
+println!("1 new tweet: {}", tweet.summarize());
+```
+
+**We can only implement a trait on a type only if either the trait or the type is local to our crate.**
+
+- We can implement `Display` (from the standard library) for `Tweet`.
+- We can implement `Summary` for `Vec<T>`.
+- We **cannot** implement `Display` for `Vec<T>`.
+
+We can't do the third because of *coherence*, or more specifically *the orohan rule* (the parent type is not present). This rule is to ensure no one else breaks your code and vice versa. Without this rule, two crates can create an implementation for the same type and Rust wouldn't know what to do.
+
+### Default Implementations
+
+```rust
+pub trait Summary {
+    fn summarize(&self) -> String {
+        String::from("(Read more...)")
+    }
+}
+```
+
+Rather than a `;`, we can define the methods in the trait for a default implementation.
+
+### Traits as Parameter
+
+We can use traits to define functions:
+
+```rust
+pub fn notify(item: &impl Summary) {
+    println!("Breaking news! {}", item.summarize());
+}
+```
+
+#### Trait Bound Syntax
+
+This is a syntatical sugar for **trait bound** syntax. The below is equivalent:
+
+```rust
+pub fn notify<T: Summary>(item: &T) {
+    println!("Breaking news! {}", item.summarize());
+}
+```
+
+The former way is a more concise way, but the latter can express more complicated functions.
+
+If we had a function that took in two `Summary` data types, it would like this:
+
+```rust
+pub fn notify(item1: &impl Summary, item2: &impl Summary) {
+```
+
+We can pass in an implementation of summary to the first and second.
+
+If we wanted to make sure that both arguments are of the same type (that implements `Summary`), we need to do:
+
+```rust
+pub fn notify<T: Summary>(item1: &T, item2: &T) {
+```
+
+This ensures that both are of the same type (but implements `Summary`).
+
+#### Specifying Multiple Trait Bounds with the `+` Syntax
+
+```rust
+pub fn notify(item: &(impl Summary + Display)) {
+```
+
+or 
+
+```rust
+pub fn notify<T: Summary + Display>(item: &T) {
+```
+
+#### Clearer Trait Bounds with `where` Clauses
+
+A function with multiple generics, each with their own trait bounds, can get pretty verbose and hard to read:
+
+```rust
+fn some_function<T: Display + Clone, U: Clone + Debug>(t: &T, u: &U) -> i32 {
+```
+
+Instead, Rust has the keyword `where`:
+
+```rust
+fn some_function<T, U>(t: &T, u: &U) -> i32
+    where T: Display + Clone,
+          U: Clone + Debug
+{
+```
+
+This makes the signature less cluttered, and human readable in a way.
+
+### Returning Types that Implement Traits
+
+We can also use the `impl Trait` syntax as a return type:
+
+```
+fn returns_summarizable() -> impl Summary {
+    Tweet {
+        username: String::from("horse_ebooks"),
+        content: String::from(
+            "of course, as you probably already know, people",
+        ),
+        reply: false,
+        retweet: false,
+    }
+}
+```
+
+This syntax **only allows one type to be returned**. The following would return an error at compile time:
+
+```rust
+fn returns_summarizable(switch: bool) -> impl Summary {
+    if switch {
+        NewsArticle {
+            headline: String::from(
+                "Penguins win the Stanley Cup Championship!",
+            ),
+            location: String::from("Pittsburgh, PA, USA"),
+            author: String::from("Iceburgh"),
+            content: String::from(
+                "The Pittsburgh Penguins once again are the best \
+                 hockey team in the NHL.",
+            ),
+        }
+    } else {
+        Tweet {
+            username: String::from("horse_ebooks"),
+            content: String::from(
+                "of course, as you probably already know, people",
+            ),
+            reply: false,
+            retweet: false,
+        }
+    }
+}   
+```
+
+`NewsArticle` and `Tweet` both implement `Summary` but the function can only return one of these, due to limitation of the compiler. We will get to how we can make this work later.
+
+### Fixing the largest Function with Trait Bounds
+
+Let's revisit our `largest` function:
+
+```rust
+fn largest<T>(list: &[T]) -> &T {
+    let mut largest = &list[0];
+
+    for item in list {
+        if item > largest {
+            largest = item;
+        }
+    }
+
+    largest
+}
+```
+
+We can add a trait bound to allow the use of `>`:
+
+```rust
+fn largest<T: PartialOrd>(list: &[T]) -> T {
+    let mut largest = list[0];
+
+    for &item in list {
+        if item > largest {
+            largest = item;
+        }
+    }
+
+    largest
+}
+```
+
+but another issue arises:
+
+```console
+$ cargo run
+   Compiling chapter10 v0.1.0 (file:///projects/chapter10)
+error[E0508]: cannot move out of type `[T]`, a non-copy slice
+ --> src/main.rs:2:23
+  |
+2 |     let mut largest = list[0];
+  |                       ^^^^^^^
+  |                       |
+  |                       cannot move out of here
+  |                       move occurs because `list[_]` has type `T`, which does not implement the `Copy` trait
+  |                       help: consider borrowing here: `&list[0]`
+
+error[E0507]: cannot move out of a shared reference
+ --> src/main.rs:4:18
+  |
+4 |     for &item in list {
+  |         -----    ^^^^
+  |         ||
+  |         |data moved here
+  |         |move occurs because `item` has type `T`, which does not implement the `Copy` trait
+  |         help: consider removing the `&`: `item`
+
+error: aborting due to 2 previous errors
+
+Some errors have detailed explanations: E0507, E0508.
+For more information about an error, try `rustc --explain E0507`.
+error: could not compile `chapter10`.
+
+To learn more, run the command again with --verbose.
+```
+
+Data types stored on the stack implement a `Copy` trait, which allows us to *move* `list[0]` into `largest`. With generics, we do not know if the data type implements this trait.
+
+Quick fix is to add another bound trait:
+
+```rust
+fn largest<T: PartialOrd + Copy>(list: &[T]) -> T {
+    let mut largest = list[0];
+
+    for &item in list {
+        if item > largest {
+            largest = item;
+        }
+    }
+
+    largest
+}
+```
+
+Other approaches:
+
+- If we don't want to limit to `Copy` we can have it bound by `Clone`, and then clone the element in the logic. We would potentially be making more heap allocations in this case.
+
+```rust
+fn largest<T: PartialOrd + Clone>(list: &[T]) -> T {
+    let mut largest = list[0].clone();
+
+    for item in list {
+        if item > &largest {
+            largest = item.clone();
+        }
+    }
+
+    largest
+}
+```
+
+- We can implement `largest` to return a reference to `T` value. We do not need `Clone` or `Copy` in this case.
+
+```rust
+fn largest<T: PartialOrd>(list: &[T]) -> &T {
+    let mut largest = &list[0];
+
+    for item in list.iter() {
+        if item > largest {
+            largest = &item;
+        }
+    }
+
+    largest
+}
+```
+
+### Using Trait Bounds to Conditionally Implement Methods
+
+We can conditionally create methods on types using trait bounds on `impl` blocks.
+
+```rust
+use std::fmt::Display;
+
+struct Pair<T> {
+    x: T,
+    y: T,
+}
+
+impl<T> Pair<T> {
+    fn new(x: T, y: T) -> Self {
+        Self { x, y }
+    }
+}
+
+impl<T: Display + PartialOrd> Pair<T> {
+    fn cmp_display(&self) {
+        if self.x >= self.y {
+            println!("The largest member is x = {}", self.x);
+        } else {
+            println!("The largest member is y = {}", self.y);
+        }
+    }
+}
+```
+
+Here we define `new` for all `Pair<T>`, but define `cmp_display` only for `Pair<T>` where `T` implements `Display` and `PartialOrd`.
+
+We can also conditionally implement a trait for any type that implements another trait. This is called **blanket implementations**.
+
+These are used a lot in the Rust library. An example - implementing the `ToString` trait for types that implement `Display` trait.
+
+```rust
+impl<T: Display> ToString for T {
+    // --snip--
+}
+```
+
+Because the standard library has this blanket implementation, we can call `to_string` on any type that implements the `Display` trait.
+
+> Blanket implementations appear in the documentation for the trait in the “Implementors” section.
